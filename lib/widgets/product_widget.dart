@@ -3,12 +3,14 @@ import 'package:provider/provider.dart';
 
 import '../screen/product_detail.dart';
 import '../providers/product.dart';
+import '../providers/cart.dart';
 
 class ProductItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeData _theme = Theme.of(context);
-    final Product _product = Provider.of<Product>(context);
+    final Product _product = Provider.of<Product>(context, listen: false);
+    final Cart _cart = Provider.of<Cart>(context, listen: false);
     const Radius _radius = Radius.circular(10);
     return GestureDetector(
       onTap: () {
@@ -34,7 +36,9 @@ class ProductItem extends StatelessWidget {
             ),
             trailing: IconButton(
               icon: Icon(Icons.shopping_cart),
-              onPressed: () {},
+              onPressed: () {
+                _cart.addItem(_product.id, _product.title, _product.price);
+              },
               color: _theme.accentColor,
             ),
             title: Text(
