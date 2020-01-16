@@ -23,6 +23,14 @@ class Cart with ChangeNotifier {
     return _items.length;
   }
 
+  double get totalAmount {
+    return (_items.isEmpty)
+        ? 0
+        : (_items.values
+            .map<double>((item) => (item.price * item.quantity))
+            .reduce((_, __) => _ + __));
+  }
+
   void addItem(String productId, String title, double price) {
     if (_items.containsKey(productId)) {
       _items.update(

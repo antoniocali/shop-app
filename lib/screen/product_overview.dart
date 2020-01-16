@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shop_app/screen/cart_screen.dart';
 
 import '../widgets/badge.dart';
 import '../providers/cart.dart';
@@ -30,15 +31,20 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
         title: Text("MyShop"),
         actions: <Widget>[
           Consumer<Cart>(
-            builder: (ctx, _cart, child) {
-              return Badge(
-                child: child,
-                value: _cart.length.toString(),
-                color: Colors.red,
-              );
-            },
-            child: const Icon(Icons.shopping_cart),
-          ),
+              builder: (ctx, _cart, child) {
+                return Badge(
+                  child: child,
+                  value: _cart.length.toString(),
+                  color: Colors.red,
+                );
+              },
+              child: IconButton(
+                icon: const Icon(Icons.shopping_cart),
+                onPressed: () {
+                  return Navigator.of(context)
+                      .pushNamed(CartScreen.routeName);
+                },
+              )),
           PopupMenuButton(
             icon: Icon(Icons.more_vert),
             itemBuilder: (_) => [
