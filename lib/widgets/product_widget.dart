@@ -9,7 +9,7 @@ class ProductItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeData _theme = Theme.of(context);
-    final Product _product = Provider.of<Product>(context, listen: false);
+    final Product _product = Provider.of<Product>(context);
     final Cart _cart = Provider.of<Cart>(context, listen: false);
     const Radius _radius = Radius.circular(10);
     return GestureDetector(

@@ -15,12 +15,17 @@ class CartItem {
 class Cart with ChangeNotifier {
   Map<String, CartItem> _items = {};
 
+
   Map<String, CartItem> get items {
     return {..._items};
   }
 
   int get length {
     return _items.length;
+  }
+
+  List<CartItem> get values {
+    return [...items.values];
   }
 
   double get totalAmount {
@@ -31,13 +36,20 @@ class Cart with ChangeNotifier {
             .reduce((_, __) => _ + __));
   }
 
+  void removeItem(String productId) {
+    if (_items.containsKey(productId)) {
+      _items.remove(productId);
+      notifyListeners();
+    }
+  }
+
   void addItem(String productId, String title, double price) {
     if (_items.containsKey(productId)) {
       _items.update(
         productId,
         (old) => CartItem(
             id: old.id,
-            title: old.id,
+            title: old.title,
             price: old.price,
             quantity: old.quantity + 1),
       );
