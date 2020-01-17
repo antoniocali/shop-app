@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shop_app/widgets/cart_item.dart';
 
+import '../widgets/cart_item.dart';
 import '../providers/cart.dart';
+import '../providers/orders.dart';
 
 class CartScreen extends StatelessWidget {
   static const String routeName = '/cart';
@@ -10,6 +11,7 @@ class CartScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final ThemeData _theme = Theme.of(context);
     final Cart _cart = Provider.of<Cart>(context);
+    final Orders _orders = Provider.of<Orders>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
         title: Text("Cart"),
@@ -17,7 +19,7 @@ class CartScreen extends StatelessWidget {
       body: Column(
         children: <Widget>[
           Card(
-            margin: EdgeInsets.only(top:16, left: 16, right: 16, bottom: 5),
+            margin: EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 5),
             child: Padding(
               padding: EdgeInsets.all(10),
               child: Row(
@@ -43,7 +45,14 @@ class CartScreen extends StatelessWidget {
                     child: Text(
                       "ORDER NOW",
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      _orders.addOrder(
+                          items: _cart.values,
+                          date: DateTime.now(),
+                          price: _cart.totalAmount);
+                      _cart.cleanCart();
+                      Navigator.of(context).pop();
+                    },
                   ),
                 ],
               ),
@@ -53,7 +62,8 @@ class CartScreen extends StatelessWidget {
             child: ListView.builder(
               itemCount: _cart.length,
               itemBuilder: (_, idx) {
-                return CartItemWidget(_cart.values[idx], _cart.items.keys.toList()[idx]);
+                return CartItemWidget(
+                    _cart.values[idx], _cart.items.keys.toList()[idx]);
               },
             ),
           )
