@@ -43,16 +43,20 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
               child: IconButton(
                 icon: const Icon(Icons.shopping_cart),
                 onPressed: () {
-                  return Navigator.of(context)
-                      .pushNamed(CartScreen.routeName);
+                  return Navigator.of(context).pushNamed(CartScreen.routeName);
                 },
               )),
           PopupMenuButton(
             icon: Icon(Icons.more_vert),
             itemBuilder: (_) => [
               PopupMenuItem(
-                  child: Text("Only Favourite"), value: FilterOption.FAV),
-              PopupMenuItem(child: Text("Show All"), value: FilterOption.ALL)
+                child: Text("Only Favourite"),
+                value: FilterOption.FAV,
+              ),
+              PopupMenuItem(
+                child: Text("Show All"),
+                value: FilterOption.ALL,
+              )
             ],
             onSelected: (FilterOption selected) {
               if (selected == FilterOption.FAV) {
