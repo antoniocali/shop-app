@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../screen/user_product.dart';
 import '../screen/orders_screen.dart';
 import '../screen/product_overview.dart';
 
@@ -37,7 +38,16 @@ class DrawerMenu extends StatelessWidget {
               Navigator.of(context)
                   .pushReplacementNamed(OrdersScreen.routeName);
             },
-          )
+          ),
+          Divider(),
+          ListTile(
+            leading: Icon(Icons.perm_identity),
+            title: Text("User Products"),
+            onTap: () {
+              Navigator.of(context)
+                  .pushReplacementNamed(UserProductScreen.routeName);
+            },
+          ),
         ],
       ),
     );
