@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import './product.dart';
 
 class Products with ChangeNotifier {
-
   List<Product> _items = [
     Product(
       id: 'p1',
@@ -39,12 +38,38 @@ class Products with ChangeNotifier {
     ),
   ];
 
-
   List<Product> get items {
     return [..._items];
   }
 
   int get length {
     return _items.length;
+  }
+
+  void addItem(String title, String description, String price, String imageUrl,
+      String id) {
+    final Product _newProduct = Product(
+        id: DateTime.now().toString(),
+        price: double.parse(price),
+        description: description,
+        title: title,
+        imageUrl: imageUrl);
+    if (id != null) {
+      int _index = _items.indexWhere((elem) => elem.id == id);
+      if (_index > 0) {
+        _newProduct.isFav = _items[_index].isFav;
+        _items[_index] = _newProduct;
+      }
+    } else {
+      _items.add(_newProduct);
+    }
+    notifyListeners();
+  }
+
+  void deleteItem(Product _product) {
+    if (_items.contains(_product)) {
+      _items.remove(_product);
+      notifyListeners();
+    }
   }
 }

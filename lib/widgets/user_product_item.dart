@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../providers/products_provider.dart';
+import '../screen/edit_product_screen.dart';
 import '../providers/product.dart';
 
 class UserProductItem extends StatelessWidget {
@@ -9,6 +12,8 @@ class UserProductItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeData _theme = Theme.of(context);
+    final Products _products = Provider.of<Products>(context, listen: false);
+
     return ListTile(
       title: Text(_product.title),
       leading: CircleAvatar(
@@ -20,12 +25,17 @@ class UserProductItem extends StatelessWidget {
           children: <Widget>[
             IconButton(
               icon: Icon(Icons.edit),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.of(context).pushNamed(EditProductScreen.routeName,
+                    arguments: _product);
+              },
               color: _theme.primaryColorDark,
             ),
             IconButton(
               icon: Icon(Icons.delete),
-              onPressed: () {},
+              onPressed: () {
+                _products.deleteItem(_product);
+              },
               color: _theme.errorColor,
             )
           ],
