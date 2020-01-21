@@ -21,9 +21,10 @@ class _EditProductScreenState extends State<EditProductScreen> {
     'description': '',
     'imageUrl': '',
     'price': '',
-    'id' : null,
+    'id': null,
   };
   bool _init = false;
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -64,18 +65,40 @@ class _EditProductScreenState extends State<EditProductScreen> {
     super.dispose();
   }
 
-  void _saveForm() {
+  Future<void> _saveForm() async {
     if (_form.currentState.validate()) {
       _form.currentState.save();
+      setState(() {
+        _isLoading = true;
+      });
+
       final Products _products = Provider.of<Products>(context, listen: false);
-      _products.addItem(
-        _initValues['title'],
-        _initValues['description'],
-        _initValues['price'],
-        _initValues['imageUrl'],
-        _initValues['id']
-      );
-      Navigator.of(context).pop();
+      try {
+        await _products.addItem(
+            _initValues['title'],
+            _initValues['description'],
+            _initValues['price'],
+            _initValues['imageUrl'],
+            _initValues['id']);
+
+        Navigator.of(context).pop();
+      } catch (_) {
+        showDialog(
+          context: context,
+          builder: (ctx) {
+            return AlertDialog(
+              title: Text("Error occurs"),
+              content: Text("Something went wrong."),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text("Okay"),
+                  onPressed: () => Navigator.of(ctx).pop(),
+                )
+              ],
+            );
+          },
+        );
+      }
     }
   }
 
@@ -93,106 +116,111 @@ class _EditProductScreenState extends State<EditProductScreen> {
           )
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _form,
-          child: ListView(
-            children: <Widget>[
-              TextFormField(
-                initialValue: _initValues['title'],
-                decoration: InputDecoration(
-                  labelText: "Title",
-                ),
-                validator: (value) {
-                  if (value.isNotEmpty)
-                    return null;
-                  else
-                    return "Please provide a title";
-                },
-                textInputAction: TextInputAction.next,
-                onFieldSubmitted: (_) =>
-                    FocusScope.of(context).requestFocus(_priceFocusNode),
-                onSaved: (value) => _initValues['title'] = value,
-              ),
-              TextFormField(
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
-                initialValue: _initValues['price'],
-                decoration: InputDecoration(
-                  labelText: "Price",
-                ),
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return "Please provide a price";
-                  }
-                  if (double.tryParse(value) == null) {
-                    return "Please provide a valid number";
-                  }
-                  if (double.parse(value) <= 0) {
-                    return "Please provide a positive price";
-                  }
-                  return null;
-                },
-                textInputAction: TextInputAction.next,
-                focusNode: _priceFocusNode,
-                onFieldSubmitted: (_) =>
-                    FocusScope.of(context).requestFocus(_descriptionFocusNode),
-                onSaved: (value) => _initValues['price'] = value,
-              ),
-              TextFormField(
-                maxLines: 3,
-                keyboardType: TextInputType.multiline,
-                initialValue: _initValues['description'],
-                decoration: InputDecoration(
-                  labelText: "Description",
-                ),
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return "Provide a description";
-                  }
-                  return null;
-                },
-                focusNode: _descriptionFocusNode,
-                onSaved: (value) => _initValues['description'] = value,
-              ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Container(
-                    width: 100,
-                    height: 100,
-                    margin: EdgeInsets.only(top: 8, right: 8),
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Colors.black,
+      body: _isLoading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Form(
+                key: _form,
+                child: ListView(
+                  children: <Widget>[
+                    TextFormField(
+                      initialValue: _initValues['title'],
+                      decoration: InputDecoration(
+                        labelText: "Title",
                       ),
+                      validator: (value) {
+                        if (value.isNotEmpty)
+                          return null;
+                        else
+                          return "Please provide a title";
+                      },
+                      textInputAction: TextInputAction.next,
+                      onFieldSubmitted: (_) =>
+                          FocusScope.of(context).requestFocus(_priceFocusNode),
+                      onSaved: (value) => _initValues['title'] = value,
                     ),
-                    child: _urlTextController.text.isEmpty
-                        ? Text("Url not provided")
-                        : FittedBox(
-                            child: Image.network(
-                              _urlTextController.text,
-                              fit: BoxFit.cover,
+                    TextFormField(
+                      keyboardType:
+                          TextInputType.numberWithOptions(decimal: true),
+                      initialValue: _initValues['price'],
+                      decoration: InputDecoration(
+                        labelText: "Price",
+                      ),
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return "Please provide a price";
+                        }
+                        if (double.tryParse(value) == null) {
+                          return "Please provide a valid number";
+                        }
+                        if (double.parse(value) <= 0) {
+                          return "Please provide a positive price";
+                        }
+                        return null;
+                      },
+                      textInputAction: TextInputAction.next,
+                      focusNode: _priceFocusNode,
+                      onFieldSubmitted: (_) => FocusScope.of(context)
+                          .requestFocus(_descriptionFocusNode),
+                      onSaved: (value) => _initValues['price'] = value,
+                    ),
+                    TextFormField(
+                      maxLines: 3,
+                      keyboardType: TextInputType.multiline,
+                      initialValue: _initValues['description'],
+                      decoration: InputDecoration(
+                        labelText: "Description",
+                      ),
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return "Provide a description";
+                        }
+                        return null;
+                      },
+                      focusNode: _descriptionFocusNode,
+                      onSaved: (value) => _initValues['description'] = value,
+                    ),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Container(
+                          width: 100,
+                          height: 100,
+                          margin: EdgeInsets.only(top: 8, right: 8),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.black,
                             ),
                           ),
-                  ),
-                  Expanded(
-                    child: TextFormField(
-                      decoration: InputDecoration(labelText: "Url"),
-                      controller: _urlTextController,
-                      keyboardType: TextInputType.url,
-                      textInputAction: TextInputAction.done,
-                      focusNode: _urlFocusNode,
-                      onFieldSubmitted: (_) => _saveForm(),
-                      onSaved: (value) => _initValues['imageUrl'] = value,
-                    ),
-                  )
-                ],
-              )
-            ],
-          ),
-        ),
-      ),
+                          child: _urlTextController.text.isEmpty
+                              ? Text("Url not provided")
+                              : FittedBox(
+                                  child: Image.network(
+                                    _urlTextController.text,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                        ),
+                        Expanded(
+                          child: TextFormField(
+                            decoration: InputDecoration(labelText: "Url"),
+                            controller: _urlTextController,
+                            keyboardType: TextInputType.url,
+                            textInputAction: TextInputAction.done,
+                            focusNode: _urlFocusNode,
+                            onFieldSubmitted: (_) => _saveForm(),
+                            onSaved: (value) => _initValues['imageUrl'] = value,
+                          ),
+                        )
+                      ],
+                    )
+                  ],
+                ),
+              ),
+            ),
     );
   }
 }
