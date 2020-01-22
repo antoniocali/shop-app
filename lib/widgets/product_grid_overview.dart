@@ -10,9 +10,8 @@ class ProductGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final productsData = Provider.of<Products>(context);
-    productsData.fetchAndSetProducts();
     final products = productsData.items.where((pdx) => !_showFav || pdx.isFav).toList();
-    return GridView.builder(
+    return products.isEmpty ? Center(child: Text("No products found"),) : GridView.builder(
       itemCount: products.length,
       itemBuilder: (context, idx) {
         return ChangeNotifierProvider.value(

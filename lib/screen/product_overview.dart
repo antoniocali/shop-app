@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../providers/products_provider.dart';
 import '../screen/cart_screen.dart';
 import '../widgets/drawer.dart';
 import '../widgets/badge.dart';
@@ -18,6 +19,22 @@ class ProductsOverviewScreen extends StatefulWidget {
 
 class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
   bool _showFav = false;
+  bool _init = false;
+  bool _isLoading = false;
+
+  @override
+  void didChangeDependencies() {
+    if (!_init) {
+      _isLoading = true;
+      Provider.of<Products>(context).fetchAndSetProducts().then((_) {
+        setState(() {
+          _isLoading = false;
+        });
+      });
+      _init = true;
+    }
+    super.didChangeDependencies();
+  }
 
   void toogleFav(bool newVal) {
     setState(() {
@@ -68,7 +85,9 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
           )
         ],
       ),
-      body: ProductGrid(_showFav),
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : ProductGrid(_showFav),
     );
   }
 }
