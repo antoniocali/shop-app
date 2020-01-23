@@ -38,21 +38,10 @@ class CartScreen extends StatelessWidget {
                     ),
                     backgroundColor: _theme.accentColor,
                   ),
-                  FlatButton(
-                    splashColor: _theme.accentColor.withAlpha(100),
-                    colorBrightness: Brightness.light,
-                    textColor: _theme.accentColor,
-                    child: Text(
-                      "ORDER NOW",
-                    ),
-                    onPressed: () {
-                      _orders.addOrder(
-                          items: _cart.values,
-                          date: DateTime.now(),
-                          price: _cart.totalAmount);
-                      _cart.cleanCart();
-                      Navigator.of(context).pop();
-                    },
+                  OrderButton(
+                    theme: _theme,
+                    orders: _orders,
+                    cart: _cart,
                   ),
                 ],
               ),
@@ -69,6 +58,66 @@ class CartScreen extends StatelessWidget {
           )
         ],
       ),
+    );
+  }
+}
+
+class OrderButton extends StatefulWidget {
+  const OrderButton({
+    Key key,
+    @required ThemeData theme,
+    @required Orders orders,
+    @required Cart cart,
+  })  : _theme = theme,
+        _orders = orders,
+        _cart = cart,
+        super(key: key);
+
+  final ThemeData _theme;
+  final Orders _orders;
+  final Cart _cart;
+
+  @override
+  _OrderButtonState createState() => _OrderButtonState();
+}
+
+class _OrderButtonState extends State<OrderButton> {
+  bool _isLoading = false;
+  @override
+  Widget build(BuildContext context) {
+    return FlatButton(
+      splashColor: widget._theme.accentColor.withAlpha(100),
+      colorBrightness: Brightness.light,
+      textColor: widget._theme.accentColor,
+      child: _isLoading
+          ? CircularProgressIndicator()
+          : Text(
+              "ORDER NOW",
+            ),
+      onPressed: (widget._cart.length <= 0 || _isLoading)
+          ? null
+          : () async {
+              try {
+                setState(() {
+                  _isLoading = true;
+                });
+
+                await widget._orders.addOrder(
+                    items: widget._cart.values,
+                    date: DateTime.now(),
+                    price: widget._cart.totalAmount);
+                setState(() {
+                  _isLoading = false;
+                });
+                widget._cart.cleanCart();
+              } catch (error) {
+                Scaffold.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text("Error placing the order"),
+                  ),
+                );
+              }
+            },
     );
   }
 }

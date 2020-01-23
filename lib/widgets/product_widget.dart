@@ -11,6 +11,8 @@ class ProductItem extends StatelessWidget {
     final ThemeData _theme = Theme.of(context);
     final Product _product = Provider.of<Product>(context);
     final Cart _cart = Provider.of<Cart>(context, listen: false);
+    final ScaffoldState _scaffold = Scaffold.of(context);
+
     const Radius _radius = Radius.circular(10);
     return GestureDetector(
       onTap: () {
@@ -31,7 +33,15 @@ class ProductItem extends StatelessWidget {
             leading: IconButton(
               icon:
                   Icon(_product.isFav ? Icons.favorite : Icons.favorite_border),
-              onPressed: _product.toggleFav,
+              onPressed: () async {
+                try {
+                  await _product.toggleFav();
+                } catch (error) {
+                  _scaffold.showSnackBar(SnackBar(
+                    content: Text("Error fav the item"),
+                  ));
+                }
+              },
               color: _theme.accentColor,
             ),
             trailing: IconButton(
@@ -41,7 +51,10 @@ class ProductItem extends StatelessWidget {
                 Scaffold.of(context).showSnackBar(
                   SnackBar(
                     content: Text("Added ${_product.title} to cart"),
-                    action: SnackBarAction(label: "Undo", onPressed: () => _cart.removeItem(_product.id),),
+                    action: SnackBarAction(
+                      label: "Undo",
+                      onPressed: () => _cart.removeItem(_product.id),
+                    ),
                   ),
                 );
               },

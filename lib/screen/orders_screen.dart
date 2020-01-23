@@ -15,16 +15,33 @@ class OrdersScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text("Orders"),
       ),
-      body: orders.lenght == 0
-          ? Center(
-              child: Text("No orders yet"),
-            )
-          : ListView.builder(
-              itemCount: orders.lenght,
-              itemBuilder: (_, idx) {
-                return OrderWidget(orders.items[idx], idx);
-              },
-            ),
+      body: FutureBuilder(
+        future: orders.fetchOrders(),
+        builder: (ctx, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          } else {
+            if (snapshot.error != null) {
+              print(snapshot.error);
+              return Center(child: Text("Error fetching orders"));
+            } else {
+              if (orders.lenght == 0)
+                return Center(
+                  child: Text("No orders yet"),
+                );
+              else
+                return ListView.builder(
+                  itemCount: orders.lenght,
+                  itemBuilder: (_, idx) {
+                    return OrderWidget(orders.items[idx], idx);
+                  },
+                );
+            }
+          }
+        },
+      ),
     );
   }
 }

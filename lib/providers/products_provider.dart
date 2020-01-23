@@ -20,7 +20,9 @@ class Products with ChangeNotifier {
           price: value['price'],
           title: value['title'],
           description: value['description'],
-          imageUrl: value['imageUrl']);
+          imageUrl: value['imageUrl'],
+          isFav: value['isFav']
+          );
     }).toList();
 
     notifyListeners();
@@ -52,8 +54,8 @@ class Products with ChangeNotifier {
           price: double.parse(price),
           description: description,
           title: title,
-          imageUrl: imageUrl);
-      _newProduct.isFav = false;
+          imageUrl: imageUrl,
+          isFav: false);
       _items.add(_newProduct);
     } else {
       final Product _newProduct = Product(
